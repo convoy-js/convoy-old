@@ -1,0 +1,34 @@
+{
+  "root": "packages/saga",
+  "sourceRoot": "packages/saga/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/saga",
+        "tsConfig": "packages/saga/tsconfig.lib.json",
+        "packageJson": "packages/saga/package.json",
+        "main": "packages/saga/src/index.ts",
+        "assets": ["packages/saga/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/saga/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/saga"],
+      "options": {
+        "jestConfig": "packages/saga/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,4 +1,12 @@
 {
   "version": 2,
-  "projects": {}
+  "projects": {
+    "command": "packages/command",
+    "common": "packages/common",
+    "core": "packages/core",
+    "domain": "packages/domain",
+    "event": "packages/event",
+    "examples-kafka": "examples/kafka",
+    "saga": "packages/saga"
+  }
 }

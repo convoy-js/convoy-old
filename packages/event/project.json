@@ -1,0 +1,34 @@
+{
+  "root": "packages/event",
+  "sourceRoot": "packages/event/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/event",
+        "tsConfig": "packages/event/tsconfig.lib.json",
+        "packageJson": "packages/event/package.json",
+        "main": "packages/event/src/index.ts",
+        "assets": ["packages/event/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/event/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/event"],
+      "options": {
+        "jestConfig": "packages/event/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

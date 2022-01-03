@@ -1,0 +1,34 @@
+{
+  "root": "packages/message",
+  "sourceRoot": "packages/message/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/message",
+        "tsConfig": "packages/message/tsconfig.lib.json",
+        "packageJson": "packages/message/package.json",
+        "main": "packages/message/src/index.ts",
+        "assets": ["packages/message/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/message/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/message"],
+      "options": {
+        "jestConfig": "packages/message/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,0 +1,52 @@
+{
+  "root": "packages/examples/kafka",
+  "sourceRoot": "packages/examples/kafka/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/examples/kafka",
+        "main": "packages/examples/kafka/src/main.ts",
+        "tsConfig": "packages/examples/kafka/tsconfig.app.json",
+        "assets": ["packages/examples/kafka/src/assets"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "packages/examples/kafka/src/environments/environment.ts",
+              "with": "packages/examples/kafka/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:execute",
+      "options": {
+        "buildTarget": "examples-kafka:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/examples/kafka/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/examples/kafka"],
+      "options": {
+        "jestConfig": "packages/examples/kafka/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["example"]
+}

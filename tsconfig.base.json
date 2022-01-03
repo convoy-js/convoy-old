@@ -8,13 +8,24 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
-    "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": ["esnext"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@convoy/command": ["packages/command/src/index.ts"],
+      "@convoy/common": ["packages/common/src/index.ts"],
+      "@convoy/core": ["packages/core/src/index.ts"],
+      "@convoy/database": ["packages/database/src/index.ts"],
+      "@convoy/domain": ["packages/domain/src/index.ts"],
+      "@convoy/event": ["packages/event/src/index.ts"],
+      "@convoy/kafka": ["packages/kafka/src/index.ts"],
+      "@convoy/message": ["packages/message/src/index.ts"],
+      "@convoy/saga": ["packages/saga/src/index.ts"],
+      "@convoy/web": ["packages/web/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

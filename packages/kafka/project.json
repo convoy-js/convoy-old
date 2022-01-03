@@ -1,0 +1,34 @@
+{
+  "root": "packages/kafka",
+  "sourceRoot": "packages/kafka/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/kafka",
+        "tsConfig": "packages/kafka/tsconfig.lib.json",
+        "packageJson": "packages/kafka/package.json",
+        "main": "packages/kafka/src/index.ts",
+        "assets": ["packages/kafka/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/kafka/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/kafka"],
+      "options": {
+        "jestConfig": "packages/kafka/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
