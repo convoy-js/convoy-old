@@ -1,17 +1,13 @@
-import { typedArrayToBuffer } from '@deepkit/type';
-import type {
-  EachMessagePayload,
-  IHeaders,
-  Message as ProducerMessage,
-} from 'kafkajs';
+import { ReceiveType, typedArrayToBuffer } from '@deepkit/type';
+import type { EachMessagePayload, Message as ProducerMessage } from 'kafkajs';
 
+import { ReceiveTypesStore } from '@convoy/common';
 import { Message, MessageHeaders } from '@convoy/message';
 
 import { KafkaMessage } from './kafka-message';
-import type { ClassType } from '@deepkit/core';
 
 export class KafkaMessageBuilder {
-  async to(message: Message): Promise<ProducerMessage> {
+  to<T>(message: Message<T>): ProducerMessage {
     const value = typedArrayToBuffer(message.encode());
     const headers = message.headers.asRecord();
 
@@ -22,25 +18,24 @@ export class KafkaMessageBuilder {
     };
   }
 
-  async from<T>({
-    message,
-    partition,
-  }: EachMessagePayload): Promise<KafkaMessage<T>> {
-    const payload = new Uint8Array(message.value as Buffer);
+  from<T>({ message, partition }: EachMessagePayload): KafkaMessage<T> {
+    const payload = new Uint8Array(message.value);
     const headers = MessageHeaders.fromRecord({
       ...message.headers,
       [Message.ID]: message.key,
     });
 
-    // TODO - global store containing all events & commands schemas
-    const schema = {} as unknown as ClassType<T>;
+    const receiveTypeName = headers.getRequired(Message.TYPE) as string;
+    const receiveType = ReceiveTypesStore.get(
+      receiveTypeName,
+    ) as ReceiveType<T>;
 
-    return new KafkaMessage(
-      schema,
+    return new KafkaMessage<T>(
+      receiveType,
       payload,
       headers,
       // eslint-disable-next-line prefer-rest-params
-      arguments[0] as EachMessagePayload
+      arguments[0] as EachMessagePayload,
     );
   }
 }

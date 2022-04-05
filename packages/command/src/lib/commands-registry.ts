@@ -1,21 +1,21 @@
 import type { ClassType } from '@deepkit/core';
 
-import { InternalCommandDispatcher } from '@convoy/commands/internal-command-dispatcher';
-import { CommandHandlers } from '@convoy/commands/command-handlers';
-import { CommandHandler } from '@convoy/commands/command-handler';
 import {
   InternalMessageConsumer,
   InternalMessageProducer,
 } from '@convoy/message';
 
 import type { CommandHandlerConfig } from './decorators';
+import { CommandHandlers } from './command-handlers';
+import { InternalCommandDispatcher } from './internal-command-dispatcher';
+import { CommandHandler } from './command-handler';
 
 export abstract class CommandsRegistry<M = unknown> {
   readonly handlers = new CommandHandlers();
 
   protected constructor(
     private readonly messageConsumer: InternalMessageConsumer,
-    private readonly messageProducer: InternalMessageProducer
+    private readonly messageProducer: InternalMessageProducer,
   ) {}
 
   abstract getInstance<T>(controller: ClassType<T>, module?: M): T;
@@ -25,7 +25,7 @@ export abstract class CommandsRegistry<M = unknown> {
       this.constructor.name,
       this.handlers,
       this.messageConsumer,
-      this.messageProducer
+      this.messageProducer,
     );
 
     await commandDispatcher.subscribe();
@@ -34,10 +34,11 @@ export abstract class CommandsRegistry<M = unknown> {
   register(
     { type, methodName, options }: CommandHandlerConfig,
     controller: ClassType,
-    module?: M
+    module?: M,
   ) {
     const instance = this.getInstance(controller, module);
     const handler = instance[methodName].bind(instance);
+    // TODO: command channel
     this.handlers.add(new CommandHandler('', type, handler, options));
   }
 }

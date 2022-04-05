@@ -1,33 +1,28 @@
 import { Message, MessageHeaders, MessageProducer } from '@convoy/message';
-import type { ClassType } from '@deepkit/core';
 
-import { DomainEvent } from '../event';
 import { EventMessageHeaders } from './event-message-headers';
+import { getClassName, getClassTypeFromInstance } from '@deepkit/core';
 
 export class DomainEventPublisher {
   constructor(private readonly messageProducer: MessageProducer) {}
 
-  private createMessageForDomainEvent(
+  private createMessageForDomainEvent<E>(
     aggregateType: string,
     aggregateId: string | number,
     headers: MessageHeaders,
-    event: DomainEvent,
-  ): Message {
-    return new Message(
-      event.constructor as ClassType<DomainEvent>,
-      event,
-      headers,
-    )
+    event: E,
+  ): Message<E> {
+    return new Message(getClassTypeFromInstance(event), event, headers)
       .setHeader(Message.PARTITION_ID, aggregateId)
       .setHeader(EventMessageHeaders.AGGREGATE_ID, aggregateId)
       .setHeader(EventMessageHeaders.AGGREGATE_TYPE, aggregateType)
-      .setHeader(EventMessageHeaders.EVENT_TYPE, event.constructor.name);
+      .setHeader(EventMessageHeaders.EVENT_TYPE, getClassName(event));
   }
 
-  async publish(
+  async publish<E extends readonly any[]>(
     aggregateType: string,
     aggregateId: string | number,
-    domainEvents: readonly DomainEvent[],
+    domainEvents: E,
     headers = new MessageHeaders(),
   ): Promise<void> {
     const messages = domainEvents.map(domainEvent =>

@@ -11,28 +11,27 @@ import { TopicPartitionOffsetTracker } from './topic-partition-offset-tracker';
 import { TopicPartitionOffset } from './topic-partition-offsets';
 
 export class KafkaMessageProcessor {
-  private readonly topicPartitionOffsetTracker =
-    new TopicPartitionOffsetTracker();
+  readonly topicPartitionOffsetTracker = new TopicPartitionOffsetTracker();
 
-  constructor(private handlers: readonly KafkaMessageHandler[] = []) {}
+  constructor(private handlers: readonly KafkaMessageHandler<any>[] = []) {}
 
-  addHandler(handler: KafkaMessageHandler): void {
+  addHandler<T>(handler: KafkaMessageHandler<T>): void {
     this.handlers = [...this.handlers, handler];
   }
 
   // @Transactional()
-  async process(
-    message: KafkaMessage,
-    payload: EachMessagePayload
+  async process<T>(
+    message: KafkaMessage<T>,
+    payload: EachMessagePayload,
   ): Promise<TopicPartitionOffset> {
     const tpo = new TopicPartitionOffset(
       payload.topic,
       payload.partition,
-      BigInt(payload.message.offset)
+      BigInt(payload.message.offset),
     );
 
     this.topicPartitionOffsetTracker.noteUnprocessed(tpo);
-    await Promise.all(this.handlers.map((handle) => handle(message)));
+    await Promise.all(this.handlers.map(handle => handle(message)));
     this.topicPartitionOffsetTracker.noteProcessed(tpo);
 
     return tpo;
@@ -43,7 +42,7 @@ export class KafkaMessageProcessor {
   }
 
   serializeOffsetsToCommit(
-    tpos: readonly TopicPartitionOffset[]
+    tpos: readonly TopicPartitionOffset[],
   ): readonly TopicPartitionOffsetAndMetadata[] {
     return tpos.map(({ topic, offset, partition }) => ({
       topic,

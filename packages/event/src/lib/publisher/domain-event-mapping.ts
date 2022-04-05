@@ -1,7 +1,7 @@
-import type { DomainEvent } from '../event';
+import { getClassName } from '@deepkit/core';
 
 export class DomainEventMapping {
-  eventToExternalEventType(aggregateType: string, event: DomainEvent): string {
-    return event.constructor.name;
+  eventToExternalEventType<E>(aggregateType: string, event: E): string {
+    return getClassName(event);
   }
 }

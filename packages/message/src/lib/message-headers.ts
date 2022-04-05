@@ -1,6 +1,8 @@
 // import type { EntityProperty, Platform } from '@mikro-orm/core';
 // import { Type } from '@mikro-orm/core';
 
+import { MissingHeaderException } from './exceptions';
+
 export type MessageRecordHeaders = Record<string, string | Buffer>;
 
 export class MessageHeaders extends Map<string, string | Buffer> {
@@ -15,6 +17,14 @@ export class MessageHeaders extends Map<string, string | Buffer> {
 
   asRecord(): MessageRecordHeaders {
     return Object.fromEntries(this);
+  }
+
+  getRequired(name: string): string | Buffer {
+    const value = this.get(name);
+    if (!value) {
+      throw new MissingHeaderException(name);
+    }
+    return value;
   }
 }
 

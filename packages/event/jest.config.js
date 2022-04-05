@@ -4,6 +4,7 @@ module.exports = {
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',
+      babelConfig: '.babelrc',
     },
   },
   testEnvironment: 'node',

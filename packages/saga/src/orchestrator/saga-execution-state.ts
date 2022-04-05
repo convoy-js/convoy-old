@@ -7,9 +7,9 @@ export class SagaExecutionState {
   }
 
   constructor(
-    @t readonly currentlyExecuting: number = -1,
-    @t public compensating: boolean = false,
-    @t public endState: boolean = false,
+    readonly currentlyExecuting: number = -1,
+    public compensating: boolean = false,
+    public endState: boolean = false,
   ) {}
 
   startCompensating(): SagaExecutionState {

@@ -1,14 +1,8 @@
-import { getBSONDecoder, getBSONSerializer } from '@deepkit/bson';
-import type { ClassType } from '@deepkit/core';
-import { validateFactory } from '@deepkit/type/dist/cjs/src/validation';
+import { getBSONDeserializer, getBSONSerializer } from '@deepkit/bson';
+import { ReceiveType, validateFunction } from '@deepkit/type';
 
-import type {
-  AsyncLikeFn,
-  Consumer,
-  IMessage,
-  MessagePayload,
-  RecordLiteral,
-} from '@convoy/common';
+import { convoyBsonBinarySerializer } from '@convoy/common';
+import type { AsyncLikeFn, Consumer, IMessage } from '@convoy/common';
 
 import { MessageLogger } from './logger';
 import { MessageHeaders } from './message-headers';
@@ -17,20 +11,34 @@ import {
   MessageMissingHeaderException,
 } from './exceptions';
 
-export type MessageHandler<P = RecordLiteral> = Consumer<Message<P>, void>;
+export type MessageHandler<T> = Consumer<Message<T>, void>;
 
 export type MessageSubscription = Promise<AsyncLikeFn>;
 
-export class Message<T = RecordLiteral> implements IMessage {
+export interface MessagePayload<T> {
+  readonly encoded: Uint8Array;
+  readonly decoded: T;
+}
+
+export class Message<T> implements IMessage<T> {
   static readonly ID = 'id';
   static readonly PARTITION_ID = 'partition_id';
   static readonly DESTINATION = 'destination';
   static readonly DATE = 'date';
   static readonly TYPE = 'type';
 
-  readonly #_encode = getBSONSerializer(this.schema);
-  readonly #_decode = getBSONDecoder<T>(this.schema);
-  readonly #_validate = validateFactory(this.schema);
+  readonly #encode = getBSONSerializer<T>(
+    convoyBsonBinarySerializer,
+    this.schema,
+  );
+  readonly #decode = getBSONDeserializer<T>(
+    convoyBsonBinarySerializer,
+    this.schema,
+  );
+  readonly #validate = validateFunction<T | Uint8Array>(
+    convoyBsonBinarySerializer,
+    this.schema,
+  );
   #encodedPayload: Uint8Array;
   #decodedPayload: T;
 
@@ -62,20 +70,21 @@ export class Message<T = RecordLiteral> implements IMessage {
     return this.getRequiredHeader(Message.TYPE);
   }
 
-  static from<T>(type: ClassType<T>, payload: Uint8Array): Message<T> {
+  static from<T>(type: ReceiveType<T>, payload: Uint8Array): Message<T> {
     return new Message<T>(type, payload);
   }
 
   constructor(
-    readonly schema: ClassType<T>,
+    readonly schema: ReceiveType<T>,
     readonly _somePayload: T | Uint8Array,
-    headers?: MessageHeaders
+    headers?: MessageHeaders,
   ) {
     this.headers = new MessageHeaders(headers ? [...headers] : []);
+    // this.headers.set(Message.TYPE, (schema as ClassType<T>).name);
   }
 
   private validateOrThrow(payload: T | Uint8Array): asserts payload is T {
-    const validationErrors = this.#_validate(payload);
+    const validationErrors = this.#validate(payload);
 
     if (validationErrors.length) {
       MessageLogger.error(validationErrors);
@@ -89,10 +98,11 @@ export class Message<T = RecordLiteral> implements IMessage {
       let decoded = this._somePayload;
 
       if (this._somePayload instanceof Uint8Array) {
-        decoded = this.#_decode(this._somePayload);
+        decoded = this.#decode(this._somePayload);
+      } else {
+        this.validateOrThrow(decoded);
       }
 
-      this.validateOrThrow(decoded);
       this.#decodedPayload = decoded;
     }
 
@@ -103,7 +113,7 @@ export class Message<T = RecordLiteral> implements IMessage {
     if (!this.#encodedPayload) {
       if (!(this._somePayload instanceof Uint8Array)) {
         this.validateOrThrow(this._somePayload);
-        this.#encodedPayload = this.#_encode(this._somePayload);
+        this.#encodedPayload = this.#encode(this._somePayload);
       } else {
         this.#encodedPayload = this._somePayload;
       }

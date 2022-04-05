@@ -1,99 +1,94 @@
 import type { ClassType } from '@deepkit/core';
-import { rpc } from '@deepkit/rpc';
+import { getClassName } from '@deepkit/core';
 import {
+  ClassDecoratorResult,
   createClassDecoratorContext,
   createPropertyDecoratorContext,
-  mergeDecorator,
+  PropertyDecoratorResult,
+  ReceiveType,
 } from '@deepkit/type';
 
-import type { CommandMessageHandlerOptions } from '@convoy/commands/command-handler';
-import { CommandHandlerPreLock } from '@convoy/commands/reply-lock';
+import type { CommandMessageHandlerOptions } from './command-handler';
+import type { CommandHandlerPreLock } from './reply-lock';
+import { ReceiveTypesStore } from '@convoy/common';
 
-interface Command {}
-
-class CommandStore {
-  type?: ClassType<Command>;
+class CommandStore<T> {
+  type?: ReceiveType<T>;
 }
 
-export interface CommandHandlerConfig {
-  readonly type: ClassType;
+export interface CommandHandlerConfig<T> {
+  readonly type: ReceiveType<T>;
   readonly methodName: string;
   readonly options: CommandMessageHandlerOptions;
 }
 
 class CommandClassHandlerStore {
-  readonly commands = new Set<CommandHandlerConfig>();
+  readonly commands = new Map<string, CommandHandlerConfig<any>>();
 }
 
-export const commandClass = createClassDecoratorContext(
-  class {
-    t = new CommandClassHandlerStore();
+class CommandClassApi {
+  t = new CommandClassHandlerStore();
 
-    addListener(
-      type: ClassType,
-      methodName: string,
-      withLock: boolean,
-      preLock?: CommandHandlerPreLock
-    ): void {
-      const options: CommandMessageHandlerOptions = { withLock, preLock };
-      this.t.commands.add({ type, methodName, options });
-    }
+  addListener<T>(
+    type: ReceiveType<T>,
+    methodName: string,
+    withLock: boolean,
+    preLock?: CommandHandlerPreLock,
+  ): void {
+    const options: CommandMessageHandlerOptions = { withLock, preLock };
+    const className = getClassName(type);
+    this.t.commands.set(className, { type, methodName, options });
+    ReceiveTypesStore.set(className, type);
   }
-);
+}
 
-export const commandDispatcher = createPropertyDecoratorContext(
-  class {
-    preLockFn?: CommandHandlerPreLock;
-    withLockValue = false;
+export const commandClass: ClassDecoratorResult<typeof CommandClassApi> =
+  createClassDecoratorContext(CommandClassApi);
 
-    t = new CommandStore();
+class CommandDispatcherApi {
+  preLockFn?: CommandHandlerPreLock;
+  withLockValue = false;
 
-    onDecorator(controller: ClassType, property?: string): void {
-      if (!this.t.type)
-        throw new Error(
-          '@commandDispatcher.listen(commandType) is the correct syntax.'
-        );
-      if (!property)
-        throw new Error(
-          '@commandDispatcher.listen(commandType) works only on class properties.'
-        );
+  t = new CommandStore();
 
-      commandClass.addListener(
-        this.t.type,
-        property,
-        this.withLockValue,
-        this.preLockFn
-      )(controller);
-    }
+  onDecorator(controller: ClassType, property?: string): void {
+    if (!this.t.type)
+      throw new Error(
+        '@commandDispatcher.listen(commandType) is the correct syntax.',
+      );
+    if (!property)
+      throw new Error(
+        '@commandDispatcher.listen(commandType) works only on class properties.',
+      );
 
-    /*preLock(fn: CommandHandlerPreLock) {
-      this.preLockFn = fn;
-      return this;
-    }
-
-    // Register a lock target for the given command
-    withLock(): this {
-      this.withLockValue = true;
-      return this;
-    }*/
-
-    // Register a new command listener for given command type
-    listen<T>(commandType: ClassType<T>): void {
-      if (!commandType) {
-        new Error('@commandDispatcher.listen() No command given');
-      }
-      this.t.type = commandType;
-    }
+    commandClass.addListener(
+      this.t.type,
+      property,
+      this.withLockValue,
+      this.preLockFn,
+    )(controller);
   }
-);
 
-interface CommandOptions {
-  readonly type: ClassType<Command>;
-  readonly name: string;
+  /*preLock(fn: CommandHandlerPreLock) {
+    this.preLockFn = fn;
+    return this;
+  }
+
+  // Register a lock target for the given command
+  withLock(): this {
+    this.withLockValue = true;
+    return this;
+  }*/
+
+  // Register a new command listener for given command type
+  listen<T>(commandType: ReceiveType<T>): void {
+    if (!commandType) {
+      new Error('@commandDispatcher.listen() No command given');
+    }
+    this.t.type = commandType;
+  }
 }
 
-class CommandsStore {
-  readonly commands = new Set<CommandOptions>();
-}
-
-export const command = mergeDecorator(commandDispatcher);
+export const commandDispatcher: PropertyDecoratorResult<
+  typeof CommandDispatcherApi
+> = createPropertyDecoratorContext(CommandDispatcherApi);

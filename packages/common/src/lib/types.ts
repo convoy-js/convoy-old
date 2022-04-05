@@ -44,11 +44,11 @@ export interface Builder<T> {
 
 export interface Dispatcher {
   subscribe(): Promise<void>;
-  handleMessage(message: IMessage): Promise<void>;
+  handleMessage<T>(message: IMessage<T>): Promise<void>;
 }
 
-export interface Handler<H extends AsyncLikeFn> {
-  handles(message: IMessage): boolean;
+export interface Handler<H extends AsyncLikeFn, T = any> {
+  handles(message: IMessage<T>): boolean;
   readonly invoke: H;
 }
 

@@ -4,11 +4,11 @@ import type { DataObject } from '@convoy/common';
 import type { SagaActions } from './saga-actions';
 import type { SagaExecutionState } from './saga-execution-state';
 
-export interface SagaDefinition<D extends DataObject> {
+export interface SagaDefinition<D> {
   start(sagaData: D): Promise<SagaActions<D>>;
-  handleReply(
+  handleReply<T>(
     currentState: SagaExecutionState,
     sagaData: D,
-    message: Message,
+    message: Message<T>,
   ): Promise<SagaActions<D>>;
 }

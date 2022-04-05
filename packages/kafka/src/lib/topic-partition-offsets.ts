@@ -1,16 +1,14 @@
-import { t } from '@deepkit/type';
+import { entity } from '@deepkit/type';
 
+// @entity.name('topic-partition-offset')
 export class TopicPartitionOffset {
   constructor(
-    @t
     readonly topic: string,
-    @t
     readonly partition: number,
     // Offsets are represented as strings in kafkajs
     // but the actual representation is int64, which V8 doesn't support
     // so we just convert them into bigint
-    @t.bigint
-    readonly offset: bigint
+    readonly offset: bigint,
   ) {}
 }
 
@@ -27,15 +25,15 @@ export class TopicPartitionOffsets {
   }
 
   toCommit(): bigint | undefined {
-    return this.unprocessed.find((x) => this.processed.includes(x));
+    return this.unprocessed.find(x => this.processed.includes(x));
   }
 
   noteCommitted(offset: bigint): void {
-    this.unprocessed = this.unprocessed.filter((x) => x >= offset);
-    this.processed = this.processed.filter((x) => x >= offset);
+    this.unprocessed = this.unprocessed.filter(x => x >= offset);
+    this.processed = this.processed.filter(x => x >= offset);
   }
 
   getPending(): readonly bigint[] {
-    return this.unprocessed.filter((x) => this.processed.includes(x));
+    return this.unprocessed.filter(x => this.processed.includes(x));
   }
 }

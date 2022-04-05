@@ -7,6 +7,9 @@
     "domain": "packages/domain",
     "event": "packages/event",
     "examples-kafka": "examples/kafka",
-    "saga": "packages/saga"
+    "kafka": "packages/kafka",
+    "message": "packages/message",
+    "saga": "packages/saga",
+    "web": "packages/web"
   }
 }

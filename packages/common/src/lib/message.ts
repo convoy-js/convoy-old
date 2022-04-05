@@ -1,21 +1,19 @@
-import type { ClassType } from '@deepkit/core';
-import type { ClassSchema } from '@deepkit/type';
-
 import type { ID, RecordLiteral } from './types';
+import { ReceiveType } from '@deepkit/type';
 
-export interface MessagePayload<P = RecordLiteral> {
-  encoded: Uint8Array;
-  decoded: P;
+export interface MessagePayload<T> {
+  readonly encoded: Uint8Array;
+  readonly decoded: T;
 }
 
 export type MessageHeaders = Map<string, string | Buffer>;
 
-export interface IMessage<P = RecordLiteral> {
+export interface IMessage<T = any> {
   id: ID;
   partition: number;
   type: string;
-  payload: MessagePayload;
-  schema: ClassType | ClassSchema;
+  payload: MessagePayload<T>;
+  schema: ReceiveType<T>;
   headers: MessageHeaders;
   // decode(): RecordLiteral;
   // encode(): Uint8Array;

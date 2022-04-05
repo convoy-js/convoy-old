@@ -17,7 +17,7 @@ import { StepToExecute } from './step-to-execute';
 export class ConvoySagaDefinition<D extends DataObject>
   implements SagaDefinition<D>
 {
-  constructor(private readonly sagaSteps: SagaStep<D>[]) {}
+  constructor(private readonly sagaSteps: readonly SagaStep<D>[]) {}
 
   private async nextStepToExecute(
     { compensating, currentlyExecuting }: SagaExecutionState,

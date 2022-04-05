@@ -1,12 +1,12 @@
 import type { ClassType } from '@deepkit/core';
 import { createClassDecoratorContext } from '@deepkit/type';
 
-class CommandStore {
-  type?: ClassType;
+class CommandStore<T> {
+  type?: ReceiveType<T>;
 }
 
-interface CommandOptions {
-  readonly type: ClassType;
+interface CommandOptions<T> {
+  readonly type: ReceiveType<T>;
   readonly name: string;
 }
 

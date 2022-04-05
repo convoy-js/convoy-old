@@ -5,26 +5,31 @@ import { MessageLogger } from './logger';
 import type { Message, MessageHandler, MessageSubscription } from './message';
 
 export abstract class MessageConsumer {
-  protected readonly handlers = new Map<string, readonly MessageHandler[]>();
+  protected readonly handlers = new Map<
+    string,
+    readonly MessageHandler<any>[]
+  >();
 
   protected addHandlerToChannel(
     channel: string,
-    handler: MessageHandler
+    handler: MessageHandler<any>,
   ): void {
     const handlers = this.handlers.get(channel) || [];
     this.handlers.set(channel, [...handlers, handler]);
   }
 
-  protected getHandlersByChannel(channel: string): readonly MessageHandler[] {
+  protected getHandlersByChannel(
+    channel: string,
+  ): readonly MessageHandler<any>[] {
     return this.handlers.get(channel) || [];
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  abstract subscribe(
+  abstract subscribe<T>(
     subscriberId: string,
     channels: readonly string[],
-    handler: MessageHandler,
-    isEventHandler?: boolean
+    handler: MessageHandler<T>,
+    isEventHandler?: boolean,
   ): MessageSubscription;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -37,29 +42,29 @@ export class InternalMessageConsumer extends MessageConsumer {
   constructor(
     // private readonly channelMapping: ConvoyChannelMapping,
     private readonly target: MessageConsumer,
-    private readonly duplicateMessageDetector: DuplicateMessageDetector = new DuplicateMessageDetector()
+    private readonly duplicateMessageDetector: DuplicateMessageDetector = new DuplicateMessageDetector(),
   ) {
     super();
   }
 
   // TODO: @Transactional should actually be here, or ..?
-  async handleMessage(
+  async handleMessage<T>(
     subscriberId: string,
-    message: Message,
-    handler: MessageHandler
+    message: Message<T>,
+    handler: MessageHandler<T>,
   ): Promise<void> {
     await this.duplicateMessageDetector.doWithMessage(
       subscriberId,
       message,
-      handler
+      handler,
     );
   }
 
-  async subscribe(
+  async subscribe<T>(
     subscriberId: string,
     channels: readonly string[],
-    handler: MessageHandler,
-    isEventHandler?: boolean
+    handler: MessageHandler<T>,
+    isEventHandler?: boolean,
   ): MessageSubscription {
     MessageLogger.debug(`Subscribing ${subscriberId} to channels ${channels}`);
 
@@ -69,8 +74,9 @@ export class InternalMessageConsumer extends MessageConsumer {
     const sub = await this.target.subscribe(
       subscriberId,
       channels,
-      (message: Message) => this.handleMessage(subscriberId, message, handler),
-      isEventHandler
+      (message: Message<T>) =>
+        this.handleMessage(subscriberId, message, handler),
+      isEventHandler,
     );
     this.subs.set(subscriberId, sub);
 

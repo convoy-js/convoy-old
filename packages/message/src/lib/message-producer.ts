@@ -3,15 +3,15 @@ import { uuid } from '@deepkit/type';
 import { Message } from './message';
 
 export abstract class MessageProducer {
-  abstract sendBatch(
+  abstract sendBatch<T>(
     destination: string,
-    messages: readonly Message[],
+    messages: readonly Message<T>[],
     isEvent: boolean,
   ): Promise<void>;
 
-  abstract send(
+  abstract send<T>(
     destination: string,
-    message: Message,
+    message: Message<T>,
     isEvent: boolean,
   ): Promise<void>;
 

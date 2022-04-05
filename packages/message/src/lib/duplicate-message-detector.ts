@@ -1,10 +1,10 @@
 import type { Message, MessageHandler } from './message';
 
 export class DuplicateMessageDetector {
-  async doWithMessage(
+  async doWithMessage<T>(
     subscriberId: string,
-    message: Message,
-    handleMessage: MessageHandler
+    message: Message<T>,
+    handleMessage: MessageHandler<T>,
   ): Promise<void> {
     await handleMessage(message);
   }

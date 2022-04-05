@@ -1,12 +1,12 @@
 import { CommandWithDestination } from '@convoy/command';
 import { RuntimeException } from '@convoy/common';
-import type { Builder, DataObject } from '@convoy/common';
+import type { Builder } from '@convoy/common';
 
 import { SagaExecutionState } from './saga-execution-state';
 
-export class SagaActions<D extends DataObject> {
+export class SagaActions<D> {
   constructor(
-    readonly commands: readonly CommandWithDestination<unknown>[],
+    readonly commands: readonly CommandWithDestination[],
     readonly local: boolean,
     readonly updatedSagaData?: D,
     readonly updatedState?: SagaExecutionState,
@@ -14,10 +14,8 @@ export class SagaActions<D extends DataObject> {
   ) {}
 }
 
-export class SagaActionsBuilder<D extends DataObject>
-  implements Builder<SagaActions<D>>
-{
-  private commands: readonly CommandWithDestination<any>[] = [];
+export class SagaActionsBuilder<D> implements Builder<SagaActions<D>> {
+  private commands: readonly CommandWithDestination[] = [];
   private local = false;
   private updatedSagaData?: D;
   private updatedState?: SagaExecutionState;

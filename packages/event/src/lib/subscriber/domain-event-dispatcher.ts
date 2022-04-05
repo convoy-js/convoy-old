@@ -32,7 +32,7 @@ export class DomainEventDispatcher implements Dispatcher {
     );
   }
 
-  async handleMessage(message: Message): Promise<void> {
+  async handleMessage<T>(message: Message<T>): Promise<void> {
     const aggregateType = message.getRequiredHeader(
       EventMessageHeaders.AGGREGATE_TYPE,
     );

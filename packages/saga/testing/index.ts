@@ -32,6 +32,7 @@ import type { SagaInstance } from '@nest-convoy/sagas/orchestration/entities';
 
 import { mockProvider } from '../common';
 import { MessageWithDestination } from './message-with-destination';
+import { getClassName } from '@deepkit/core';
 
 @Injectable()
 export class SagaTestInstanceRepository extends DefaultSagaInstanceRepository {
@@ -86,7 +87,7 @@ export class SagaExpectCommandTest<Data> {
       .withReference(reply)
       .withHeader(Message.ID, uuid())
       .withHeader(ReplyMessageHeaders.REPLY_OUTCOME, outcome)
-      .withHeader(ReplyMessageHeaders.REPLY_TYPE, reply.constructor.name)
+      .withHeader(ReplyMessageHeaders.REPLY_TYPE, getClassName(reply))
       .withHeader(SagaReplyHeaders.REPLY_SAGA_TYPE, this.sagaInstance.type)
       .withHeader(SagaReplyHeaders.REPLY_SAGA_ID, this.sagaInstance.id)
       .build();
@@ -123,7 +124,7 @@ export class SagaExpectCommandTest<Data> {
       const sentCommand = sentCommands[0];
 
       expect(commandChannel).toEqual(sentCommand.destination);
-      expect(this.expectedCommand.constructor.name).toEqual(
+      expect(getClassName(this.expectedCommand)).toEqual(
         sentCommand.message.getRequiredHeader(
           CommandMessageHeaders.COMMAND_TYPE,
         ),

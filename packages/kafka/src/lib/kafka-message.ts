@@ -1,12 +1,12 @@
 import type { EachMessagePayload } from 'kafkajs';
-import type { ClassType } from '@deepkit/core';
+import { ReceiveType } from '@deepkit/type';
 
 import { Message, MessageHeaders } from '@convoy/message';
-import type { Consumer, RecordLiteral } from '@convoy/common';
+import type { Consumer } from '@convoy/common';
 
-export type KafkaMessageHandler = Consumer<KafkaMessage, void>;
+export type KafkaMessageHandler<T> = Consumer<KafkaMessage<T>, void>;
 
-export class KafkaMessage<T = RecordLiteral> extends Message<T> {
+export class KafkaMessage<T> extends Message<T> {
   static readonly PARTITION = 'kafka_partition';
   static readonly OFFSET = 'kafka_offset';
   static readonly TOPIC = 'kafka_topic';
@@ -35,10 +35,10 @@ export class KafkaMessage<T = RecordLiteral> extends Message<T> {
   }
 
   public constructor(
-    schema: ClassType<T>,
+    schema: ReceiveType<T>,
     payload: T | Uint8Array,
     headers: MessageHeaders,
-    { topic, partition, message: { offset } }: EachMessagePayload
+    { topic, partition, message: { offset } }: EachMessagePayload,
   ) {
     super(schema, payload, headers);
 
