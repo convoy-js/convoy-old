@@ -1,5 +1,7 @@
-import { commandClass, commandDispatcher } from '../decorators';
-import { getClassName } from '@deepkit/core';
+import {
+  commandDispatcherClass,
+  commandDispatcher,
+} from '../command-dispatcher';
 import { ReceiveTypesStore } from '@convoy/common';
 
 class Test {
@@ -14,7 +16,8 @@ class CommandHandlers {
 describe('@commandDispatcher.listen()', () => {
   it('should add type to CommandClass store', () => {
     expect(
-      commandClass._fetch(CommandHandlers).commands.get(Test.name).type,
+      commandDispatcherClass._fetch(CommandHandlers).commands.get(Test.name)
+        .type,
     ).toBe(Test);
   });
 

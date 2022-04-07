@@ -1,0 +1,32 @@
+{
+  "root": "packages/saga/testing",
+  "sourceRoot": "packages/saga/testing/src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/saga/testing",
+        "main": "packages/saga/testing/src/index.ts",
+        "tsConfig": "packages/saga/testing/tsconfig.lib.json",
+        "assets": ["packages/saga/testing/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/saga/testing/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/saga/testing"],
+      "options": {
+        "jestConfig": "packages/saga/testing/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

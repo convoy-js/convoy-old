@@ -78,7 +78,7 @@ export class SagaDatabaseLockManager extends SagaLockManager {
   ): Promise<void> {
     const messageId = message.getRequiredHeader(Message.ID);
 
-    await this.db.persist(
+    this.db.add(
       cast<SagaStash>({
         messagePayload: message.payload.encoded,
         messageHeaders: message.headers,

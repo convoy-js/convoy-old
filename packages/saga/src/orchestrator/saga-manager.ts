@@ -8,6 +8,7 @@ import {
   Failure,
   ReplyMessageHeaders,
   Success,
+  LockTarget,
 } from '@convoy/command';
 import {
   InternalMessageConsumer,
@@ -27,12 +28,10 @@ import { SagaCommandProducer } from './saga-command-producer';
 import { Saga, SagaLifecycleHooks } from './saga';
 import { SagaDefinition } from './saga-definition';
 import { SagaActions } from './saga-actions';
-import { SagaUnlockCommand } from '../common/saga-unlock-command';
-import { SagaReplyHeaders } from '../common/saga-reply-headers';
+import { SagaUnlockCommand, SagaReplyHeaders } from '../common';
 import { SagaInstance } from './entities';
-import { LockTarget } from '../../../command/src/lib/reply-lock';
 
-export class SagaManager<Data> {
+export class SagaManager<D> {
   private readonly logger = new Logger(
     [new ConsoleTransport()],
     [new ScopeFormatter()],
@@ -51,7 +50,7 @@ export class SagaManager<Data> {
   }
 
   constructor(
-    private readonly saga: Saga<Data> & SagaLifecycleHooks<Data>,
+    private readonly saga: Saga<D> & SagaLifecycleHooks<D>,
     // private readonly sagaInstanceRepository: SagaInstanceRepository,
     private readonly db: DatabaseWrapper<any>,
     private readonly commandProducer: ConvoyCommandProducer,
@@ -60,12 +59,11 @@ export class SagaManager<Data> {
     private readonly sagaCommandProducer: SagaCommandProducer,
   ) {}
 
-  private getSagaDefinition(): SagaDefinition<Data> {
+  private getSagaDefinition(): SagaDefinition<D> {
     const sm = this.saga.sagaDefinition;
 
     if (!sm) {
-      throw new StateMachineEmptyException();
-      //this.saga.constructor as Type<Saga<Data>>,
+      throw new StateMachineEmptyException(this.saga);
     }
 
     return sm;
@@ -80,12 +78,12 @@ export class SagaManager<Data> {
   private createSuccessMessage(): Message<Success> {
     return new Message(Success, new Success())
       .setHeader(ReplyMessageHeaders.REPLY_OUTCOME, CommandReplyOutcome.SUCCESS)
-      .setHeader(ReplyMessageHeaders.REPLY_TYPE, Failure.name);
+      .setHeader(ReplyMessageHeaders.REPLY_TYPE, Success.name);
   }
 
   private updateState(
-    sagaInstance: SagaInstance<Data>,
-    actions: SagaActions<Data>,
+    sagaInstance: SagaInstance<D>,
+    actions: SagaActions<D>,
   ): void {
     if (actions.updatedState) {
       sagaInstance.state = actions.updatedState;
@@ -94,8 +92,8 @@ export class SagaManager<Data> {
 
   private async performEndStateActions(
     sagaId: string,
-    sagaInstance: SagaInstance<Data>,
-    sagaData: Data,
+    sagaInstance: SagaInstance<D>,
+    sagaData: D,
   ): Promise<void> {
     for (const participant of sagaInstance.participants) {
       const headers = new MessageHeaders();
@@ -119,9 +117,9 @@ export class SagaManager<Data> {
   }
 
   private async processActions(
-    sagaInstance: SagaInstance<Data>,
-    sagaData: Data,
-    actions: SagaActions<Data>,
+    sagaInstance: SagaInstance<D>,
+    sagaData: D,
+    actions: SagaActions<D>,
   ): Promise<void> {
     while (true) {
       if (actions.localException) {
@@ -152,7 +150,7 @@ export class SagaManager<Data> {
           );
         }
 
-        await this.db.persist(sagaInstance);
+        this.db.add(sagaInstance);
 
         if (!actions.local) break;
 
@@ -189,7 +187,7 @@ export class SagaManager<Data> {
         CommandMessageHeaders.inReply(CommandMessageHeaders.DESTINATION),
       );
       sagaInstance.addParticipant(destination, resource);
-      await this.db.persist(sagaInstance);
+      this.db.add(sagaInstance);
     }
 
     const actions = await this.getSagaDefinition().handleReply(
@@ -221,22 +219,22 @@ export class SagaManager<Data> {
     );
   }
 
-  create(data: Data): Promise<SagaInstance<Data>>;
-  create(data: Data, lockTarget?: string): Promise<SagaInstance<Data>>;
-  create<T>(
-    data: Data,
+  createInstance(data: D): Promise<SagaInstance<D>>;
+  createInstance(data: D, lockTarget?: string): Promise<SagaInstance<D>>;
+  createInstance<T>(
+    data: D,
     targetType: T,
     targetId: string,
-  ): Promise<SagaInstance<Data>>;
-  async create<T>(
-    sagaData: Data,
+  ): Promise<SagaInstance<D>>;
+  async createInstance<T>(
+    sagaData: D,
     target?: string | T,
     targetId?: string,
-  ): Promise<SagaInstance<Data>> {
+  ): Promise<SagaInstance<D>> {
     const lockTarget = new LockTarget(target, targetId);
     const resource = lockTarget.target;
 
-    const sagaInstance = cast<SagaInstance<Data>>({
+    const sagaInstance = cast<SagaInstance<D>>({
       type: this.sagaType,
       dataType: getClassName(sagaData),
       data: sagaData,

@@ -2,7 +2,7 @@ import { entity, PrimaryKey, UUID, MapName } from '@deepkit/type';
 import { MessageHeaders, MessageRecordHeaders } from '@convoy/message';
 import { Version } from '@convoy/database';
 
-@entity.name('saga_stash')
+@entity.name('saga-stash')
 export class SagaStash {
   readonly messageId: UUID & PrimaryKey;
   readonly target: string;

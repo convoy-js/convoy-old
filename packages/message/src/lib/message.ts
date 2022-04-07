@@ -156,4 +156,8 @@ export class Message<T> implements IMessage<T> {
   hasHeader(name: string): boolean {
     return this.headers.has(name);
   }
+
+  clone(): Message<T> {
+    return new Message<T>(this.schema, this._somePayload, this.headers);
+  }
 }

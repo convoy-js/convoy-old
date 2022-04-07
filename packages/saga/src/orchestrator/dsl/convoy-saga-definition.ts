@@ -1,7 +1,5 @@
-import type { ClassType } from '@deepkit/core';
-
+import type { ReceiveType } from '@deepkit/type';
 import {
-  DataObject,
   RuntimeException,
   UnsupportedOperationException,
 } from '@convoy/common';
@@ -14,9 +12,7 @@ import { SagaExecutionState } from '../saga-execution-state';
 import type { SagaStep, SagaStepReplyHandler } from './saga-step';
 import { StepToExecute } from './step-to-execute';
 
-export class ConvoySagaDefinition<D extends DataObject>
-  implements SagaDefinition<D>
-{
+export class ConvoySagaDefinition<D> implements SagaDefinition<D> {
   constructor(private readonly sagaSteps: readonly SagaStep<D>[]) {}
 
   private async nextStepToExecute(
@@ -65,10 +61,10 @@ export class ConvoySagaDefinition<D extends DataObject>
       .build();
   }
 
-  private async invokeReplyHandler(
-    message: Message,
+  private async invokeReplyHandler<T>(
+    message: Message<T>,
     data: D,
-    replyType: ClassType,
+    replyType: ReceiveType<T>,
     handleReply: SagaStepReplyHandler<D>,
   ): Promise<void> {
     const reply = await message.decode();
@@ -80,10 +76,10 @@ export class ConvoySagaDefinition<D extends DataObject>
     return this.executeNextStep(sagaData, currentState);
   }
 
-  async handleReply(
+  async handleReply<T>(
     currentState: SagaExecutionState,
     sagaData: D,
-    message: Message,
+    message: Message<T>,
   ): Promise<SagaActions<D>> {
     const currentStep = this.sagaSteps[currentState.currentlyExecuting];
     if (!currentStep) {

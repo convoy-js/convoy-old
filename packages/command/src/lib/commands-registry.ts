@@ -5,7 +5,7 @@ import {
   InternalMessageProducer,
 } from '@convoy/message';
 
-import type { CommandHandlerConfig } from './decorators';
+import type { CommandHandlerConfig } from './decorators/command-dispatcher';
 import { CommandHandlers } from './command-handlers';
 import { InternalCommandDispatcher } from './internal-command-dispatcher';
 import { CommandHandler } from './command-handler';
@@ -31,14 +31,14 @@ export abstract class CommandsRegistry<M = unknown> {
     await commandDispatcher.subscribe();
   }
 
-  register(
-    { type, methodName, options }: CommandHandlerConfig,
+  register<T>(
+    { type, methodName, options }: CommandHandlerConfig<T>,
     controller: ClassType,
     module?: M,
   ) {
     const instance = this.getInstance(controller, module);
     const handler = instance[methodName].bind(instance);
-    // TODO: command channel
+    // TODO: commandType channel
     this.handlers.add(new CommandHandler('', type, handler, options));
   }
 }

@@ -1,7 +1,7 @@
 import type { ClassType } from '@deepkit/core';
 import { Database, DatabaseSession } from '@deepkit/orm';
 import type { DatabaseAdapter } from '@deepkit/orm';
-import type { ClassSchema } from '@deepkit/type';
+import { ReflectionClass, Type } from '@deepkit/type';
 
 import { DatabaseTransactionContext } from './database-transaction-context';
 
@@ -10,7 +10,7 @@ export class DatabaseUsingContext<
 > extends DatabaseSession<DA> {
   static create<DA extends DatabaseAdapter>(
     adapter: DA,
-    schemas: (ClassType | ClassSchema)[] = [],
+    schemas: (Type | ClassType | ReflectionClass<any>)[] = [],
   ): DatabaseSession<DA> {
     const db = new Database(adapter, schemas);
 

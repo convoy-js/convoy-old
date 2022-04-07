@@ -4,12 +4,14 @@
     "command": "packages/command",
     "common": "packages/common",
     "core": "packages/core",
+    "database": "packages/database",
     "domain": "packages/domain",
     "event": "packages/event",
     "examples-kafka": "examples/kafka",
     "kafka": "packages/kafka",
     "message": "packages/message",
     "saga": "packages/saga",
+    "saga-testing": "packages/saga/testing",
     "web": "packages/web"
   }
 }

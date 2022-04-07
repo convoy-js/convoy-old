@@ -4,13 +4,14 @@ import {
   ClassDecoratorResult,
   createClassDecoratorContext,
   createPropertyDecoratorContext,
+  mergeDecorator,
   PropertyDecoratorResult,
   ReceiveType,
 } from '@deepkit/type';
-
-import type { CommandMessageHandlerOptions } from './command-handler';
-import type { CommandHandlerPreLock } from './reply-lock';
 import { ReceiveTypesStore } from '@convoy/common';
+
+import type { CommandMessageHandlerOptions } from '../command-handler';
+import type { CommandHandlerPreLock } from '../reply-lock';
 
 class CommandStore<T> {
   type?: ReceiveType<T>;
@@ -42,8 +43,9 @@ class CommandClassApi {
   }
 }
 
-export const commandClass: ClassDecoratorResult<typeof CommandClassApi> =
-  createClassDecoratorContext(CommandClassApi);
+export const commandDispatcherClass: ClassDecoratorResult<
+  typeof CommandClassApi
+> = createClassDecoratorContext(CommandClassApi);
 
 class CommandDispatcherApi {
   preLockFn?: CommandHandlerPreLock;
@@ -61,7 +63,7 @@ class CommandDispatcherApi {
         '@commandDispatcher.listen(commandType) works only on class properties.',
       );
 
-    commandClass.addListener(
+    commandDispatcherClass.addListener(
       this.t.type,
       property,
       this.withLockValue,
@@ -74,16 +76,16 @@ class CommandDispatcherApi {
     return this;
   }
 
-  // Register a lock target for the given command
+  // Register a lock target for the given commandType
   withLock(): this {
     this.withLockValue = true;
     return this;
   }*/
 
-  // Register a new command listener for given command type
+  // Register a new commandType listener for given commandType type
   listen<T>(commandType: ReceiveType<T>): void {
     if (!commandType) {
-      new Error('@commandDispatcher.listen() No command given');
+      new Error('@commandDispatcher.listen() No commandType given');
     }
     this.t.type = commandType;
   }

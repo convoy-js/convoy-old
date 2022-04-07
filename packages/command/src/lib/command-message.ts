@@ -1,8 +1,6 @@
 import type { Message, MessageHeaders } from '@convoy/message';
 
-import type { Command } from './types';
-
-export class CommandMessage<C extends Command = any> {
+export class CommandMessage<C> {
   constructor(
     readonly command: C,
     readonly message: Message<C>,

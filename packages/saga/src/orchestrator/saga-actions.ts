@@ -1,27 +1,26 @@
 import { CommandWithDestination } from '@convoy/command';
-import { RuntimeException } from '@convoy/common';
-import type { Builder } from '@convoy/common';
+import { Builder } from '@convoy/common';
 
-import { SagaExecutionState } from './saga-execution-state';
+import type { SagaExecutionState } from './saga-execution-state';
 
 export class SagaActions<D> {
   constructor(
-    readonly commands: readonly CommandWithDestination[],
+    readonly commands: readonly CommandWithDestination<any>[],
     readonly local: boolean,
     readonly updatedSagaData?: D,
     readonly updatedState?: SagaExecutionState,
-    readonly localException?: RuntimeException,
+    readonly localException?: Error,
   ) {}
 }
 
 export class SagaActionsBuilder<D> implements Builder<SagaActions<D>> {
-  private commands: readonly CommandWithDestination[] = [];
+  private commands: readonly CommandWithDestination<any>[] = [];
   private local = false;
   private updatedSagaData?: D;
   private updatedState?: SagaExecutionState;
-  private localException?: RuntimeException;
+  private localException?: Error;
 
-  withCommand(command: CommandWithDestination<any>): this {
+  withCommand<C>(command: CommandWithDestination<C>): this {
     this.commands = [...this.commands, command];
     return this;
   }
@@ -41,7 +40,7 @@ export class SagaActionsBuilder<D> implements Builder<SagaActions<D>> {
     return this;
   }
 
-  withCommands(commands: readonly CommandWithDestination<any>[]): this {
+  withCommands<C>(commands: readonly CommandWithDestination<C>[]): this {
     this.commands = [...this.commands, ...commands];
     return this;
   }
@@ -51,7 +50,7 @@ export class SagaActionsBuilder<D> implements Builder<SagaActions<D>> {
     return this;
   }
 
-  withIsLocal(localException?: RuntimeException): this {
+  withIsLocal(localException?: Error): this {
     this.localException = localException;
     this.local = true;
     return this;

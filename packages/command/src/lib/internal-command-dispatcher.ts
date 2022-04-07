@@ -1,12 +1,13 @@
-import { InternalMessageProducer } from '../../../message/src/lib/internal-message-producer';
+import { getClassName } from '@deepkit/core';
+import { Dispatcher } from '@convoy/common';
+import { InternalMessageProducer } from '@convoy/message';
 import {
   InternalMessageConsumer,
   Message,
   MessageHeaders,
 } from '@convoy/message';
-import { Dispatcher } from '@convoy/common';
+
 import { correlateMessageHeaders } from './correlate-message-headers';
-import type { ClassType } from '@deepkit/core';
 import { CommandHandlers } from './command-handlers';
 import { withFailure, withSuccess } from './command-handler-reply-builder';
 import { CommandHandler } from './command-handler';
@@ -14,9 +15,8 @@ import { CommandMessage } from './command-message';
 import { withLock } from './reply-lock';
 import { Failure, Success } from './command-reply-outcome';
 import { MissingCommandHandlerException } from './exceptions';
-import { CommandMessageHeaders } from '@convoy/command';
+import { CommandMessageHeaders } from './command-message-headers';
 import { CommandsLogger } from './logger';
-import { getClassName } from '@deepkit/core';
 
 export class InternalCommandDispatcher implements Dispatcher {
   constructor(
@@ -41,12 +41,14 @@ export class InternalCommandDispatcher implements Dispatcher {
     replies: readonly Message<any>[],
     replyChannel: string,
   ): Promise<void> {
-    const messages = replies.map(
-      reply => reply.withExtraHeaders(correlationHeaders),
-      //new Message(reply, reply.constructor as ClassType, correlationHeaders),
+    const repliesWithCorrelationHeaders = replies.map(reply =>
+      reply.clone().withExtraHeaders(correlationHeaders),
     );
 
-    await this.messageProducer.sendBatch(replyChannel, messages);
+    await this.messageProducer.sendBatch(
+      replyChannel,
+      repliesWithCorrelationHeaders,
+    );
   }
 
   protected async invoke<C>(
@@ -104,9 +106,9 @@ export class InternalCommandDispatcher implements Dispatcher {
       replies = await this.invoke(commandHandler, commandMessage);
       console.log(replies);
       CommandsLogger.debug(
-        `Generated replies ${commandHandler.command.name} ${getClassName(
-          message,
-        )} ${replies.map(reply => reply.toString())}`,
+        `Generated replies ${getClassName(
+          commandHandler.commandType,
+        )} ${getClassName(message)} ${replies.map(reply => reply.toString())}`,
       );
     } catch (err) {
       // TODO: This should never be executed (unless payload cannot be parsed), as "invoke" handles errors as well

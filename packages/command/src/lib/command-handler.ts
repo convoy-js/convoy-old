@@ -1,15 +1,16 @@
 import type { ClassType } from '@deepkit/core';
 
 import type { AsyncLikeFn, Handler, Instance } from '@convoy/common';
+import { ReceiveType } from '@deepkit/type';
+import { getClassName } from '@deepkit/core';
 import type { Message } from '@convoy/message';
 
 import type { CommandMessage } from './command-message';
 import { CommandMessageHeaders } from './command-message-headers';
 import type { CommandHandlerPreLock } from './reply-lock';
-import type { Command } from './types';
 
 export type CommandMessageHandler<
-  C extends Command,
+  C,
   R = Instance | Message<C> | undefined,
 > = AsyncLikeFn<[cm: CommandMessage<C>, pvs?: Map<string, string>], R | R[]>;
 
@@ -23,7 +24,7 @@ export class CommandHandler<C = any>
 {
   constructor(
     readonly channel: string,
-    readonly command: ClassType<C>,
+    readonly commandType: ReceiveType<C>,
     readonly invoke: CommandMessageHandler<C>,
     readonly options: CommandMessageHandlerOptions = {},
     readonly resource?: string,
@@ -41,7 +42,7 @@ export class CommandHandler<C = any>
 
   private commandTypeMatches(message: Message<C>): boolean {
     return (
-      this.command.name ===
+      getClassName(this.commandType) ===
       message.getRequiredHeader(CommandMessageHeaders.COMMAND_TYPE)
     );
   }

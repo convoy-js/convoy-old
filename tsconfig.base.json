@@ -24,8 +24,10 @@
       "@convoy/kafka": ["packages/kafka/src/index.ts"],
       "@convoy/message": ["packages/message/src/index.ts"],
       "@convoy/saga": ["packages/saga/src/index.ts"],
+      "@convoy/saga/testing": ["packages/saga/testing/src/index.ts"],
       "@convoy/web": ["packages/web/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp"],
+  "reflection": true
 }

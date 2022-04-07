@@ -26,8 +26,8 @@ export class DatabaseWrapper<DA extends DatabaseAdapter> extends Database<DA> {
     return this.ctx.raw(...args);
   }
 
-  async add(...items: OrmEntity[]): Promise<void> {
-    await this.ctx.add(...items);
+  add(...items: OrmEntity[]): void {
+    this.ctx.add(...items);
   }
 
   async remove(...items: OrmEntity[]): Promise<void> {

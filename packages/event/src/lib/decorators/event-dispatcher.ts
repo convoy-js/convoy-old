@@ -57,13 +57,13 @@ class EventDispatcherApi {
     return this;
   }
 
-  // Register a lock target for the given command
+  // Register a lock target for the given commandType
   withLock(): this {
     this.withLockValue = true;
     return this;
   }*/
 
-  // Register a new command listener for given command type
+  // Register a new commandType listener for given commandType type
   listen<T>(eventType: ReceiveType<T>): void {
     if (!eventType) {
       new Error('@eventDispatcher.listen() No event given');

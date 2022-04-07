@@ -1,11 +1,9 @@
-import type { DataObject } from '@convoy/common';
-
 import { SagaActionsBuilder } from '../saga-actions';
 import type { SagaActions } from '../saga-actions';
 import type { SagaExecutionState } from '../saga-execution-state';
 import type { SagaStep } from './saga-step';
 
-export class StepToExecute<D extends DataObject> {
+export class StepToExecute<D> {
   constructor(
     private readonly skipped: number,
     private readonly compensating: boolean,
