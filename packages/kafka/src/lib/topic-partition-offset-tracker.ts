@@ -1,7 +1,7 @@
 import { increment } from '@convoy/common';
 
 import { TopicPartitionOffsets } from './topic-partition-offsets';
-import { TopicPartitionOffset } from './topic-partition-offsets';
+import { TopicPartitionOffset } from './topic-partition-offset';
 
 export class TopicPartitionOffsetTracker {
   // HINT: The index of TopicPartitionOffsets[] is the partition
@@ -26,7 +26,7 @@ export class TopicPartitionOffsetTracker {
 
   getState(
     topic: string,
-    partition: number
+    partition: number,
   ): TopicPartitionOffsets | undefined {
     return this.state.get(topic)?.[partition];
   }
@@ -55,8 +55,8 @@ export class TopicPartitionOffsetTracker {
         .filter((value): value is [number, bigint] => value[1] != null)
         .map(
           ([partition, offset]) =>
-            new TopicPartitionOffset(topic, partition, increment(offset))
-        )
+            new TopicPartitionOffset(topic, partition, increment(offset)),
+        ),
     );
   }
 

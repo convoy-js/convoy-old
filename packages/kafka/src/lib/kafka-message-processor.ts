@@ -8,7 +8,7 @@ import type {
 import { KafkaMessage } from './kafka-message';
 import type { KafkaMessageHandler } from './kafka-message';
 import { TopicPartitionOffsetTracker } from './topic-partition-offset-tracker';
-import { TopicPartitionOffset } from './topic-partition-offsets';
+import { TopicPartitionOffset } from './topic-partition-offset';
 
 export class KafkaMessageProcessor {
   readonly topicPartitionOffsetTracker = new TopicPartitionOffsetTracker();

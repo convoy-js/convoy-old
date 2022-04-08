@@ -32,7 +32,6 @@
       "options": {
         "buildTarget": "examples-kafka:build",
         "args": ["server:start"],
-        "watch": true,
         "waitUntilTargets": ["examples-kafka:docker-compose"]
       }
     },
