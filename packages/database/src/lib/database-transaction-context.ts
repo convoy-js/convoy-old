@@ -43,7 +43,6 @@ export class DatabaseTransactionContext<
         session.useTransaction();
 
         try {
-          console.log('test');
           const res = await next(session);
           await session.commit();
           return resolve(res);

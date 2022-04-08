@@ -5,11 +5,10 @@ import {
   ScopeFormatter,
   TimestampFormatter,
 } from '@deepkit/logger';
-('');
 
 export const KafkaLogger = new Logger(
   [new ConsoleTransport()],
-  [new ScopeFormatter(), new TimestampFormatter()]
+  [new ScopeFormatter(), new TimestampFormatter()],
 ).scoped('kafka');
 
 export const KafkaClientLogger =
@@ -35,6 +34,6 @@ export const KafkaClientLogger =
     }
 
     logger[method]?.(
-      `${label} [${namespace}] ${message} ${JSON.stringify(others)}`
+      `${label} [${namespace}] ${message} ${JSON.stringify(others)}`,
     );
   };

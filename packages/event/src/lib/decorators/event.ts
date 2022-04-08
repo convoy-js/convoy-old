@@ -1,31 +1,22 @@
-import type { ClassType } from '@deepkit/core';
-import { createClassDecoratorContext } from '@deepkit/type';
+import { createClassDecoratorContext, ReceiveType } from '@deepkit/type';
 
 import { AggregateRoot } from '@convoy/domain';
 
-export class Events {
-  static readonly store = new Set<Event>();
-}
-
-class Event {
+class Event<T extends AggregateRoot> {
   name?: string;
-  aggregate?: ClassType<AggregateRoot>;
+  aggregateType?: ReceiveType<T>;
 }
 
 export const event = createClassDecoratorContext(
   class {
     readonly t = new Event();
 
-    constructor() {
-      Events.store.add(this.t);
-    }
-
     name(value: string): void {
       this.t.name = value;
     }
 
-    forAggregate(type: ClassType<AggregateRoot>) {
-      this.t.aggregate = type;
+    forAggregate<T extends AggregateRoot>(aggregateType: ReceiveType<T>) {
+      this.t.aggregateType = aggregateType;
     }
   },
 );

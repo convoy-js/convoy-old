@@ -1,8 +1,8 @@
 import type { AsyncLikeFn } from '@convoy/common';
 
 import { DuplicateMessageDetector } from './duplicate-message-detector';
-import { MessageLogger } from './logger';
-import type { Message, MessageHandler, MessageSubscription } from './message';
+import type { MessageHandler, MessageSubscription } from './message';
+import { Message } from './message';
 
 export abstract class MessageConsumer {
   protected readonly handlers = new Map<
@@ -66,7 +66,7 @@ export class InternalMessageConsumer extends MessageConsumer {
     handler: MessageHandler<T>,
     isEventHandler?: boolean,
   ): MessageSubscription {
-    MessageLogger.debug(`Subscribing ${subscriberId} to channels ${channels}`);
+    Message.logger.debug(`Subscribing ${subscriberId} to channels ${channels}`);
 
     /*const transformedChannels = channels.map(channel =>
       this.channelMapping.transform(channel),

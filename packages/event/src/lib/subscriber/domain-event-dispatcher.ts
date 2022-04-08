@@ -15,7 +15,7 @@ export class DomainEventDispatcher implements Dispatcher {
   async subscribe(): Promise<void> {
     // await Promise.all(
     //   this.domainEventHandlers.getHandlers().map(async handler => {
-    //     await this.messageConsumer.subscribe(
+    //     await this.consumer.subscribe(
     //       this.eventDispatcherId,
     //       [handler.aggregateType], // [`${handler.aggregateType}-${handler.event.name}`],
     //       this.handleMessage.bind(this),

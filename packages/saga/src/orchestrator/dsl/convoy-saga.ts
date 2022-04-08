@@ -1,21 +1,14 @@
 import { CommandWithDestinationBuilder } from '@convoy/command';
+import type { ReceiveType, TypeClass } from '@deepkit/type';
+import type { AbstractClassType } from '@deepkit/core';
 
 import { Saga } from '../saga';
 import { ConvoySagaDefinitionBuilder } from './convoy-saga-definition-builder';
 import { StepBuilder } from './step-builder';
-import type { ReceiveType } from '@deepkit/type';
 import { resolveReceiveType } from '@deepkit/type';
-import { Class } from 'type-fest';
-import type { AbstractClassType, ClassType } from '@deepkit/core';
-import { Abstract } from '@nestjs/common';
 
-export abstract class _ConvoySaga<D> extends Saga<D> {
-  constructor(sagaDataType?: ReceiveType<D>) {
-    super();
-    console.log(sagaDataType);
-  }
-
-  protected step<T>(sagaDataType?: ReceiveType<T>): StepBuilder<D> {
+export abstract class InternalConvoySaga<D> extends Saga<D> {
+  protected step(): StepBuilder<D> {
     return new StepBuilder<D>(new ConvoySagaDefinitionBuilder<D>(this));
   }
 
@@ -24,27 +17,19 @@ export abstract class _ConvoySaga<D> extends Saga<D> {
   }
 }
 
-interface ConvoySagaInterface<D> extends Saga<D> {
-  step<T>(): StepBuilder<D>;
-}
-
+// TODO: Refactor when https://github.com/deepkit/deepkit-framework/issues/209 is supported
 export function ConvoySaga<D>(
   sagaDataType?: ReceiveType<D>,
-): AbstractClassType<Saga<D>> {
-  abstract class TestSaga extends Saga<D> {
-    public constructor(sagaDataType?: ReceiveType<D>) {
-      super();
-    }
+): AbstractClassType<InternalConvoySaga<D>> {
+  const receivedType = resolveReceiveType(sagaDataType) as TypeClass;
 
-    protected step(): StepBuilder<D> {
-      console.log(resolveReceiveType(sagaDataType));
-      return new StepBuilder<D>(new ConvoySagaDefinitionBuilder<D>(this));
-    }
+  abstract class ConvoySaga extends InternalConvoySaga<D> {
+    static readonly sagaDataType = receivedType;
 
-    protected send<C>(command: C): CommandWithDestinationBuilder<C> {
-      return new CommandWithDestinationBuilder<C>(command);
+    public constructor() {
+      super(receivedType);
     }
   }
 
-  return TestSaga;
+  return ConvoySaga;
 }

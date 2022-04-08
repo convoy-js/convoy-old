@@ -1,10 +1,10 @@
-import type { RuntimeException, DataObject } from '@convoy/common';
 import { CommandWithDestination } from '@convoy/command';
 
 import type { SagaActionsBuilder } from '../saga-actions';
+
 export interface StepOutcome {
-  visit<D extends DataObject>(
-    localConsumer: (localException?: RuntimeException) => SagaActionsBuilder<D>,
+  visit<D>(
+    localConsumer: (localException?: Error) => SagaActionsBuilder<D>,
     commandsConsumer: (
       commands: readonly CommandWithDestination<any>[],
     ) => SagaActionsBuilder<D>,
@@ -12,10 +12,10 @@ export interface StepOutcome {
 }
 
 export class LocalStepOutcome implements StepOutcome {
-  constructor(private readonly localOutcome?: RuntimeException) {}
+  constructor(private readonly localOutcome?: Error) {}
 
-  visit<D extends DataObject>(
-    localConsumer: (localException?: RuntimeException) => SagaActionsBuilder<D>,
+  visit<D>(
+    localConsumer: (localException?: Error) => SagaActionsBuilder<D>,
     commandsConsumer: (
       commands: readonly CommandWithDestination<any>[],
     ) => SagaActionsBuilder<D>,
@@ -29,8 +29,8 @@ export class RemoteStepOutcome implements StepOutcome {
     private readonly commandsToSend: readonly CommandWithDestination<any>[],
   ) {}
 
-  visit<D extends DataObject>(
-    localConsumer: (localException?: RuntimeException) => SagaActionsBuilder<D>,
+  visit<D>(
+    localConsumer: (localException?: Error) => SagaActionsBuilder<D>,
     commandsConsumer: (
       commands: readonly CommandWithDestination<any>[],
     ) => SagaActionsBuilder<D>,

@@ -41,13 +41,13 @@ export class InternalCommandDispatcher implements Dispatcher {
     replies: readonly Message<any>[],
     replyChannel: string,
   ): Promise<void> {
-    const repliesWithCorrelationHeaders = replies.map(reply =>
+    const repliesWithCorrelatedHeaders = replies.map(reply =>
       reply.clone().withExtraHeaders(correlationHeaders),
     );
 
     await this.messageProducer.sendBatch(
       replyChannel,
-      repliesWithCorrelationHeaders,
+      repliesWithCorrelatedHeaders,
     );
   }
 
@@ -104,7 +104,7 @@ export class InternalCommandDispatcher implements Dispatcher {
         correlationHeaders,
       );
       replies = await this.invoke(commandHandler, commandMessage);
-      console.log(replies);
+
       CommandsLogger.debug(
         `Generated replies ${getClassName(
           commandHandler.commandType,

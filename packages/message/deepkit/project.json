@@ -1,0 +1,32 @@
+{
+  "root": "packages/message/deepkit",
+  "sourceRoot": "packages/message/deepkit/src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/message/deepkit",
+        "main": "packages/message/deepkit/src/index.ts",
+        "tsConfig": "packages/message/deepkit/tsconfig.lib.json",
+        "assets": ["packages/message/deepkit/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/message/deepkit/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/message/deepkit"],
+      "options": {
+        "jestConfig": "packages/message/deepkit/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

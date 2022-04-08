@@ -1,0 +1,32 @@
+{
+  "root": "packages/kafka/nest",
+  "sourceRoot": "packages/kafka/nest/src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/kafka/nest",
+        "main": "packages/kafka/nest/src/index.ts",
+        "tsConfig": "packages/kafka/nest/tsconfig.lib.json",
+        "assets": ["packages/kafka/nest/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/kafka/nest/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/kafka/nest"],
+      "options": {
+        "jestConfig": "packages/kafka/nest/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

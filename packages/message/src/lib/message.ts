@@ -4,12 +4,17 @@ import { ReceiveType, validateFunction } from '@deepkit/type';
 import { convoyBsonBinarySerializer } from '@convoy/common';
 import type { AsyncLikeFn, Consumer, IMessage } from '@convoy/common';
 
-import { MessageLogger } from './logger';
 import { MessageHeaders } from './message-headers';
 import {
   MessageInvalidPayloadException,
   MessageMissingHeaderException,
 } from './exceptions';
+import {
+  ConsoleTransport,
+  Logger,
+  ScopeFormatter,
+  TimestampFormatter,
+} from '@deepkit/logger';
 
 export type MessageHandler<T> = Consumer<Message<T>, void>;
 
@@ -26,6 +31,10 @@ export class Message<T> implements IMessage<T> {
   static readonly DESTINATION = 'destination';
   static readonly DATE = 'date';
   static readonly TYPE = 'type';
+  static readonly logger = new Logger(
+    [new ConsoleTransport()],
+    [new ScopeFormatter(), new TimestampFormatter()],
+  ).scoped('message');
 
   readonly #encode = getBSONSerializer<T>(
     convoyBsonBinarySerializer,
@@ -80,14 +89,13 @@ export class Message<T> implements IMessage<T> {
     headers?: MessageHeaders,
   ) {
     this.headers = new MessageHeaders(headers ? [...headers] : []);
-    // this.headers.set(Message.TYPE, (schema as ClassType<T>).name);
   }
 
   private validateOrThrow(payload: T | Uint8Array): asserts payload is T {
     const validationErrors = this.#validate(payload);
 
     if (validationErrors.length) {
-      MessageLogger.error(validationErrors);
+      Message.logger.error(validationErrors);
 
       throw new MessageInvalidPayloadException(this, validationErrors);
     }

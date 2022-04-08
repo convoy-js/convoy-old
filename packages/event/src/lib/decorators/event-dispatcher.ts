@@ -6,7 +6,6 @@ import {
   PropertyDecoratorResult,
   ReceiveType,
 } from '@deepkit/type';
-import { Events } from './event';
 import { getClassName } from '@deepkit/core';
 import { ReceiveTypesStore } from '@convoy/common';
 

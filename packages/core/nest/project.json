@@ -1,0 +1,32 @@
+{
+  "root": "packages/core/nest",
+  "sourceRoot": "packages/core/nest/src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/core/nest",
+        "main": "packages/core/nest/src/index.ts",
+        "tsConfig": "packages/core/nest/tsconfig.lib.json",
+        "assets": ["packages/core/nest/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/core/nest/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/core/nest"],
+      "options": {
+        "jestConfig": "packages/core/nest/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

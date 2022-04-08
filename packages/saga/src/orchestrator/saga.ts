@@ -1,12 +1,15 @@
 import type { AsyncLike } from '@convoy/common';
 
 import type { SagaDefinition } from './saga-definition';
+import { TypeClass } from '@deepkit/type';
 
 export type SagaLifecycleHooks<Data> = Partial<
   OnSagaRolledBack<Data> & OnSagaCompletedSuccessfully<Data> & OnStarting<Data>
 >;
 
 export abstract class Saga<Data> implements SagaLifecycleHooks<Data> {
+  constructor(readonly sagaDataType: TypeClass) {}
+
   abstract readonly sagaDefinition: SagaDefinition<Data>;
 }
 

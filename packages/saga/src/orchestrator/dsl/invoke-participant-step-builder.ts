@@ -60,12 +60,11 @@ export class InvokeParticipantStepBuilder<D>
   private wrapCommandProvider<C>(
     args: WithoutEndpointArgs<D, C>,
   ): WithDestinationArgs<D, C> {
-    const action = args.shift()!.bind(this.parent.saga) as CommandProvider<
-      D,
-      C
-    >;
+    const action = args.shift()!;
+    const method = action.bind(this.parent.saga);
+    const sagaType = getClassTypeFromInstance(this.parent.saga);
     let destination = commandProperty._fetch(
-      this.parent.saga,
+      sagaType,
       action.name,
     )?.destination;
 
@@ -73,13 +72,13 @@ export class InvokeParticipantStepBuilder<D>
       async function withDestination(
         data: D,
       ): Promise<CommandWithDestination<C>> {
-        const cmd: C | CommandWithDestination<C> = await action(data);
+        const cmd: C | CommandWithDestination<C> = await method(data);
         if (cmd instanceof CommandWithDestination) return cmd;
 
         if (!destination) {
           destination = commandClass._fetch(
             getClassTypeFromInstance(cmd),
-          ).destination;
+          )?.destination;
         }
 
         if (!destination) {
@@ -88,7 +87,7 @@ export class InvokeParticipantStepBuilder<D>
           );
         }
 
-        return new CommandWithDestination<C>(destination, cmd as C);
+        return new CommandWithDestination<C>(destination, cmd);
       },
       ...args,
     ] as unknown as WithDestinationArgs<D, C>;
@@ -121,6 +120,7 @@ export class InvokeParticipantStepBuilder<D>
         destArgs[1]?.bind(this.parent.saga),
       );
     } else {
+      // TODO
       throw new Error(args[0]);
     }
   }

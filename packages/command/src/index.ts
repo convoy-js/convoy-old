@@ -11,3 +11,4 @@ export * from './lib/command-handler';
 export * from './lib/command-handlers';
 export * from './lib/internal-command-dispatcher';
 export * from './lib/decorators';
+export * from './lib/commands-registry';

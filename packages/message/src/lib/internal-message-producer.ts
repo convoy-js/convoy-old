@@ -1,7 +1,6 @@
 import { Message } from './message';
 import { MessageProducer } from './message-producer';
 import { MessageMissingRequiredIDException } from './exceptions';
-import { MessageLogger } from './logger';
 
 export class InternalMessageProducer {
   constructor(
@@ -39,7 +38,7 @@ export class InternalMessageProducer {
     }*/
 
     try {
-      MessageLogger.debug(
+      Message.logger.debug(
         `Sending messages ${messages.map(message =>
           message.toString(),
         )} to destination ${destination}`,
@@ -49,7 +48,7 @@ export class InternalMessageProducer {
         await this.postSend(message);
       }*/
     } catch (err: any) {
-      MessageLogger.error(err.message);
+      Message.logger.error(err.message);
       /*for (const message of messages) {
         await this.postSend(message);
       }*/
@@ -66,13 +65,13 @@ export class InternalMessageProducer {
 
     // await this.preSend(message);
     try {
-      MessageLogger.debug(
+      Message.logger.debug(
         `Sending message ${message.toString()} to destination ${destination}`,
       );
       await this.target.send(destination, message, isEvent);
       // await this.postSend(message);
     } catch (err: any) {
-      MessageLogger.error(err.message);
+      Message.logger.error(err.message);
       // await this.postSend(message, err);
       throw err;
     }

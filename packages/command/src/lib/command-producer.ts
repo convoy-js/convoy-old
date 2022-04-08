@@ -1,7 +1,10 @@
 import { getClassName, getClassTypeFromInstance } from '@deepkit/core';
 
-import type { InternalMessageProducer } from '@convoy/message';
-import { Message, MessageHeaders } from '@convoy/message';
+import {
+  InternalMessageProducer,
+  Message,
+  MessageHeaders,
+} from '@convoy/message';
 
 import { CommandMessageHeaders } from './command-message-headers';
 import type { Command } from './types';

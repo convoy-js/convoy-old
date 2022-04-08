@@ -28,17 +28,19 @@ export abstract class CommandsRegistry<M = unknown> {
       this.messageProducer,
     );
 
+    console.log('init');
+
     await commandDispatcher.subscribe();
   }
 
   register<T>(
     { type, methodName, options }: CommandHandlerConfig<T>,
     controller: ClassType,
+    channel: string,
     module?: M,
   ) {
     const instance = this.getInstance(controller, module);
     const handler = instance[methodName].bind(instance);
-    // TODO: commandType channel
-    this.handlers.add(new CommandHandler('', type, handler, options));
+    this.handlers.add(new CommandHandler(channel, type, handler, options));
   }
 }

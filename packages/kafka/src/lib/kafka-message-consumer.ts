@@ -3,7 +3,6 @@ import type { TopicPartitionOffsetAndMetadata } from 'kafkajs';
 import { RuntimeException } from '@convoy/common';
 import type { MessageSubscription } from '@convoy/message';
 import { MessageConsumer } from '@convoy/message';
-import { DatabaseTransactionContext } from '@convoy/database';
 
 import { Kafka } from './kafka';
 import type { KafkaMessageHandler } from './kafka-message';
@@ -17,7 +16,6 @@ export class KafkaMessageConsumer extends MessageConsumer {
   constructor(
     private readonly kafka: Kafka,
     private readonly message: KafkaMessageBuilder,
-    private readonly transactionContext: DatabaseTransactionContext, // private readonly orm: MikroORM, // @Inject(NEST_CONVOY_ASYNC_LOCAL_STORAGE) // private readonly storage: AsyncLocalStorage<EntityManager>,
   ) {
     super();
   }

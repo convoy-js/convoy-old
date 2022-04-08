@@ -1,0 +1,32 @@
+{
+  "root": "packages/database/deepkit",
+  "sourceRoot": "packages/database/deepkit/src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/database/deepkit",
+        "main": "packages/database/deepkit/src/index.ts",
+        "tsConfig": "packages/database/deepkit/tsconfig.lib.json",
+        "assets": ["packages/database/deepkit/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/database/deepkit/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/database/deepkit"],
+      "options": {
+        "jestConfig": "packages/database/deepkit/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

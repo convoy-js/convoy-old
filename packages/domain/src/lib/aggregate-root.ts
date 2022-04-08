@@ -1,11 +1,5 @@
-import type { AsyncLike, DataObject } from '@convoy/common';
+import type { AsyncLike } from '@convoy/common';
 
-interface Event {}
-
-export abstract class AggregateRoot<T = DataObject> {
-  protected constructor(values: DataObject) {
-    Object.assign(this, values);
-  }
-
-  protected applyEvent?<E extends Event>(event: E): AsyncLike<this>;
+export abstract class AggregateRoot {
+  protected applyEvent?<E>(event: E): AsyncLike<this>;
 }

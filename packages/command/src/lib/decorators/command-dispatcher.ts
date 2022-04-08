@@ -15,6 +15,7 @@ import type { CommandHandlerPreLock } from '../reply-lock';
 
 class CommandStore<T> {
   type?: ReceiveType<T>;
+  channel?: string;
 }
 
 export interface CommandHandlerConfig<T> {
@@ -24,6 +25,7 @@ export interface CommandHandlerConfig<T> {
 }
 
 class CommandClassHandlerStore {
+  channel: string;
   readonly commands = new Map<string, CommandHandlerConfig<any>>();
 }
 
@@ -40,6 +42,10 @@ class CommandClassApi {
     const className = getClassName(type);
     this.t.commands.set(className, { type, methodName, options });
     ReceiveTypesStore.set(className, type);
+  }
+
+  channel(value: string) {
+    this.t.channel = value;
   }
 }
 
@@ -81,6 +87,10 @@ class CommandDispatcherApi {
     this.withLockValue = true;
     return this;
   }*/
+
+  channel(value: string): void {
+    this.t.channel = value;
+  }
 
   // Register a new commandType listener for given commandType type
   listen<T>(commandType: ReceiveType<T>): void {

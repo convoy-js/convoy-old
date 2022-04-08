@@ -1,10 +1,14 @@
-import { Message, MessageHeaders, MessageProducer } from '@convoy/message';
+import {
+  InternalMessageProducer,
+  Message,
+  MessageHeaders,
+} from '@convoy/message';
 
 import { EventMessageHeaders } from './event-message-headers';
 import { getClassName, getClassTypeFromInstance } from '@deepkit/core';
 
 export class DomainEventPublisher {
-  constructor(private readonly messageProducer: MessageProducer) {}
+  constructor(private readonly messageProducer: InternalMessageProducer) {}
 
   private createMessageForDomainEvent<E>(
     aggregateType: string,
@@ -48,7 +52,7 @@ export class DomainEventPublisher {
     //       event,
     //     );
     //
-    //     await this.messageProducer.send(
+    //     await this.producer.send(
     //       aggregateType.name,
     //       domainEventMessage,
     //       true,

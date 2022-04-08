@@ -2,7 +2,7 @@ import { Builder } from '@convoy/common';
 import { SagaDefinition } from '../saga-definition';
 import { SagaStep } from './saga-step';
 
-import { ConvoySaga } from './convoy-saga';
+import { InternalConvoySaga } from './convoy-saga';
 import { ConvoySagaDefinition } from './convoy-saga-definition';
 
 export class ConvoySagaDefinitionBuilder<D>
@@ -10,7 +10,7 @@ export class ConvoySagaDefinitionBuilder<D>
 {
   private readonly sagaSteps: SagaStep<D>[] = [];
 
-  constructor(readonly saga: ConvoySaga<D>) {}
+  constructor(readonly saga: InternalConvoySaga<D>) {}
 
   addStep(step: SagaStep<D>): void {
     this.sagaSteps.push(step);
